@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Para Ti 💖</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+<style>
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #fdfbfb, #ebedee);
+        color: #333;
+        overflow-x: hidden;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    /* Fundo Principal */
+    .bg {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: url('foto.jpg') center/cover no-repeat;
+        filter: blur(6px) brightness(0.7);
+        z-index: -2;
+    }
+
+    /* Hello Kitty flutuando ao fundo */
+    .kitty {
+        position: fixed;
+        bottom: -50px;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0.5;
+        animation: subir 6s linear forwards;
+    }
+
+    @keyframes subir {
+        0% { transform: translateY(0); opacity: 0; }
+        20% { opacity: 0.5; }
+        80% { opacity: 0.5; }
+        100% { transform: translateY(-110vh); opacity: 0; }
+    }
+
+    /* Containers */
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        text-align: center;
+        animation: fadeIn 1.5s ease;
+        box-sizing: border-box;
+        position: relative;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Inputs e Botões */
+    input {
+        padding: 14px;
+        border-radius: 25px;
+        border: 1px solid #ddd;
+        width: 100%;
+        max-width: 300px;
+        font-size: 16px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    button {
+        padding: 14px 28px;
+        margin: 10px;
+        border-radius: 30px;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        width: 200px;
+        max-width: 80%;
+        font-weight: 500;
+        touch-action: manipulation;
+    }
+
+    .sim {
+        background: linear-gradient(45deg, #ff7eb3, #ff758c);
+        color: white;
+        box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+    }
+
+    .nao {
+        background: #ccc;
+        color: #333;
+        position: relative;
+        transition: all 0.2s ease;
+        z-index: 10;
+    }
+
+    /* Carta */
+    .paper {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 25px;
+        border-radius: 15px;
+        max-width: 600px;
+        width: 90%;
+        max-height: 55vh;
+        overflow-y: auto;
+        box-shadow: 0px 10px 30px rgba(0,0,0,0.15);
+        line-height: 1.8;
+        text-align: left;
+        margin-bottom: 20px;
+        scrollbar-width: thin;
+        scrollbar-color: #ff758c #f1f1f1;
+    }
+
+    .paper::-webkit-scrollbar { width: 5px; }
+    .paper::-webkit-scrollbar-thumb { background: #ff758c; border-radius: 10px; }
+
+    #texto { white-space: pre-line; margin: 0; }
+    .hidden { display: none !important; }
+
+    @media (max-width: 600px) {
+        h1 { font-size: 22px; }
+        h2 { font-size: 18px; }
+        button { font-size: 14px; width: 160px; }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<audio id="musica" loop>
+  <source src="musica.mp3" type="audio/mpeg">
+</audio>
+
+<div class="container" id="login1">
+    <h2>🔒 Só para alguém especial</h2>
+    <p>Quando é que tudo começou? (Data da Primeira Chamada) 😊</p>
+    <input type="password" id="senha1" placeholder="Resposta secreta">
+    <button class="sim" onclick="verificar1()">Continuar</button>
+</div>
+
+<div class="container hidden" id="login2">
+    <h2>💖 Quase lá...</h2>
+    <p>1 + 1 = ? 🧐</p>
+    <input type="password" id="senha2" placeholder="Digite o resultado">
+    <button class="sim" onclick="verificar2()">Entrar</button>
+</div>
+
+<div class="container hidden" id="pedido">
+    <h1>💖 Glédisse...</h1>
+    <h2>Aceitas namorar comigo?</h2>
+    <div style="width: 100%; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; min-height: 150px;">
+        <button class="sim" onclick="aceitou()">SIM 💕</button>
+        <button class="nao" onmouseover="fugir()" onclick="fugir()">NÃO 😅</button>
+    </div>
+</div>
+
+<div class="container hidden" id="carta">
+    <h2>💌 Para ti</h2>
+    <div class="paper">
+        <p id="texto"></p>
+    </div>
+    <button id="botaoFinal" class="sim hidden" onclick="iniciarFinal()">💖 Aperte aqui 💖</button>
+</div>
+
+<div class="container hidden" id="final">
+    <h1>🎉 Agora é oficial 💖</h1>
+    <h3 id="contador"></h3>
+</div>
+
+<script>
+function trocarTela(atual, proximo) {
+    document.getElementById(atual).classList.add("hidden");
+    document.getElementById(proximo).classList.remove("hidden");
+}
+
+function verificar1() {
+    let s = document.getElementById("senha1").value.toLowerCase().trim();
+    if (s === "6") trocarTela("login1", "login2");
+    else alert("Resposta errada 😅");
+}
+
+function verificar2() {
+    let s = document.getElementById("senha2").value.trim();
+    // Resposta definida como 5 conforme pedido
+    if (s === "5") trocarTela("login2", "pedido");
+    else alert("Resposta errada 😅");
+}
+
+function fugir() {
+    let b = document.querySelector(".nao");
+    b.style.position = "fixed";
+    let safeMargin = 60;
+    let maxX = window.innerWidth - b.clientWidth - safeMargin;
+    let maxY = window.innerHeight - b.clientHeight - safeMargin;
+    let randomX = Math.max(safeMargin, Math.floor(Math.random() * maxX));
+    let randomY = Math.max(safeMargin, Math.floor(Math.random() * maxY));
+    b.style.left = randomX + "px";
+    b.style.top = randomY + "px";
+}
+
+function aceitou() {
+    trocarTela("pedido", "carta");
+    escrever();
+}
+
+let textoCompleto = `Glédisse, 'Doll'.
+
+Nunca imaginei que um dia estaria na posição em que me colocaste, mas ao mesmo tempo foi algo muito corajoso da tua parte fazer isso com alguém com uma personalidade como a minha. E talvez tenha sido exatamente isso que me chamou a atenção em ti e me fez querer o diferente. 
+
+E hoje sei que não me arrependo nem um pouco de ter te conhecido. És alguém muito especial para mim, e sempre serás. Às vezes é difícil encontrar palavras para explicar o que sinto por ti… é um sentimento novo, que ainda estou a aprender a demonstrar.
+
+Contigo eu sinto-me diferente. Contigo eu sou diferente. Sinto que posso ser eu mesmo, Sinto que, por vezes, posso me deixar ser vulnerável. Já não consigo ficar um dia sem falar contigo. Quando te vejo, quando ouço a tua voz é como se encontrasse a minha paz, a calma na tempestade que é a minha vida.
+
+Sei que ainda tenho muito para aprender sobre ti — sobre quem tu és e sobre como cuidar de ti da forma que mereces. E quero aprender a fazer isso enquanto estás do meu lado. Sim, pessoas já passaram pela minha vida mas contigo é diferente nunca cheguei ao ponto de me abrir a esse ponto, e espero que o meu esforço seja valorizado e respeitado. 
+
+Tu és o meu primeiro amor, o primeiro sentimento assim tão verdadeiro, a minha primeira declaração e o meu primeiro sentimento diferente, e agora a minha primeira e última namorada.
+
+Estou longe de ser perfeito. É uma nova experiência; já não sou só EU, agora somos NÓS. Disseste-me que somos pessoas diferentes, mas acho que é a diferença que nos faz iguais.
+
+As pessoas dizem 'não demonstre amor', mas fds não perco nada e vivo como quero... Mas é isso Hello Kitty, o resto vamos descobrir juntos.
+
+Esse é um pequeno resumo do que se passa na minha pequena grande cabeça. Amo-te e vou casar contigo, se me permitires.
+
+Para a minha grande pequena menina;
+
+De: Djuneee
+
+By: C J
+10/04/2026 – 22:32`;
+
+let index = 0;
+function escrever() {
+    let elemento = document.getElementById("texto");
+    let container = document.querySelector(".paper");
+    if (index < textoCompleto.length) {
+        elemento.innerHTML += textoCompleto.charAt(index);
+        index++;
+        container.scrollTop = container.scrollHeight;
+        setTimeout(escrever, 50);
+    } else {
+        document.getElementById("botaoFinal").classList.remove("hidden");
+    }
+}
+
+function iniciarFinal() {
+    document.getElementById("musica").play();
+    trocarTela("carta", "final");
+    let dataInicio = localStorage.getItem("inicioRelacionamento") || new Date().toISOString();
+    localStorage.setItem("inicioRelacionamento", dataInicio);
+    setInterval(() => {
+        let diff = new Date() - new Date(dataInicio);
+        let s = Math.floor(diff/1000)%60;
+        let m = Math.floor(diff/60000)%60;
+        let h = Math.floor(diff/3600000)%24;
+        let d = Math.floor(diff/86400000);
+        document.getElementById("contador").innerHTML = `${d} dias ${h}h ${m}m ${s}s juntos 💕`;
+    }, 1000);
+}
+
+setInterval(() => {
+    let kitty = document.createElement("div");
+    kitty.className = "kitty";
+    kitty.innerHTML = "🎀🐱";
+    kitty.style.left = Math.random() * 90 + "vw";
+    kitty.style.fontSize = (Math.random() * 20 + 20) + "px";
+    document.body.appendChild(kitty);
+    setTimeout(() => kitty.remove(), 6000);
+}, 800);
+</script>
+
+</body>
+</html>
