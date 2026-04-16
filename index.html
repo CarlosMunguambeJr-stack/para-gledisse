@@ -179,22 +179,87 @@
 </div>
 
 <script>
+    const MAX_TENTATIVAS = 3;
+
+function obterDataHoje() {
+    return new Date().toLocaleDateString();
+}
+
+function verificarTentativas() {
+    let dataHoje = obterDataHoje();
+    let dados = JSON.parse(localStorage.getItem("tentativas")) || {
+        data: dataHoje,
+        usadas: 0
+    };
+
+    if (dados.data !== dataHoje) {
+        dados = {
+            data: dataHoje,
+            usadas: 0
+        };
+        localStorage.setItem("tentativas", JSON.stringify(dados));
+    }
+
+    if (dados.usadas >= MAX_TENTATIVAS) {
+        alert("Limite de 3 tentativas atingido hoje. Volte amanhã.");
+        return false;
+    }
+
+    return true;
+}
+
+function registrarErro() {
+    let dataHoje = obterDataHoje();
+    let dados = JSON.parse(localStorage.getItem("tentativas")) || {
+        data: dataHoje,
+        usadas: 0
+    };
+
+    if (dados.data !== dataHoje) {
+        dados = {
+            data: dataHoje,
+            usadas: 0
+        };
+    }
+
+    dados.usadas++;
+    localStorage.setItem("tentativas", JSON.stringify(dados));
+
+    let restantes = MAX_TENTATIVAS - dados.usadas;
+
+    if (restantes > 0) {
+        alert(`Resposta errada 😅 Restam ${restantes} tentativa(s) hoje.`);
+    } else {
+        alert("Limite de tentativas atingido. Volte amanhã.");
+    }
+}
 function trocarTela(atual, proximo) {
     document.getElementById(atual).classList.add("hidden");
     document.getElementById(proximo).classList.remove("hidden");
 }
 
 function verificar1() {
+    if (!verificarTentativas()) return;
+
     let s = document.getElementById("senha1").value.toLowerCase().trim();
-    if (s === "6") trocarTela("login1", "login2");
-    else alert("Resposta errada 😅");
+
+    if (s === "6/03/2026") {
+        trocarTela("login1", "login2");
+    } else {
+        registrarErro();
+    }
 }
 
 function verificar2() {
+    if (!verificarTentativas()) return;
+
     let s = document.getElementById("senha2").value.trim();
-    // Resposta definida como 5 conforme pedido
-    if (s === "5") trocarTela("login2", "pedido");
-    else alert("Resposta errada 😅");
+
+    if (s === "5") {
+        trocarTela("login2", "pedido");
+    } else {
+        registrarErro();
+    }
 }
 
 function fugir() {
